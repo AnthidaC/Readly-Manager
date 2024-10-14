@@ -12,6 +12,12 @@ using System.ComponentModel.Design;
 
 public class PageManager : MonoBehaviour
 {
+
+    [Header("Home page")]
+    public TMP_Text numToship;
+    public TMP_Text numCC;
+    public TMP_Text numCP;
+
     [Header("Order page")]
     public GameObject OrderPrefab;
     public Transform Orderlist;
@@ -76,6 +82,19 @@ public class PageManager : MonoBehaviour
         dataMana= FindFirstObjectByType<DataManager>();
     }
 
+    public void Home()
+    {
+        int tp = 0, cc = 0, cp = 0;
+        foreach (Order order in DataManager.orders.Values)
+        {
+            if (order.Status == "To_ship") tp++;
+            else if (order.Status == "Cancelled") cc++;
+            else cp++;
+        }
+        numCC.text=cc.ToString();
+        numCP.text=cp.ToString();
+        numToship.text=tp.ToString();
+    }
     public void loadingOrder()
     {
         while (Orderlist.childCount > 0)
@@ -95,6 +114,7 @@ public class PageManager : MonoBehaviour
             Orderlist.gameObject.AddComponent<ContentSizeFitter>().verticalFit= ContentSizeFitter.FitMode.PreferredSize;
         }
         print("Hi Page Order");
+        Home();
         
     }
 
