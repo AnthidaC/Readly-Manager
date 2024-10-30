@@ -20,6 +20,7 @@ public class SearchBook : MonoBehaviour
             if (string.IsNullOrEmpty(ser.text) && status.value == 0&&type.value==0)
             {
                 Booklist.GetChild(i).gameObject.SetActive(true);
+                l++;
             }
             else
             {
@@ -41,6 +42,11 @@ public class SearchBook : MonoBehaviour
         {
 
             Booklist.GetComponent<ContentSizeFitter>().enabled = true;
+        }
+        else
+        {
+            Booklist.GetComponent<ContentSizeFitter>().enabled = false;
+            Booklist.GetComponent<RectTransform>().sizeDelta = new Vector2(1925, 680);
         }
     }
 }

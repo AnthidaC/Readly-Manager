@@ -19,6 +19,7 @@ public class SearchOrder : MonoBehaviour
             if (string.IsNullOrEmpty(ser.text)&&dropdown.value == 0)
             {
                 Orderlist.GetChild(i).gameObject.SetActive(true);
+                l++;
             }
             else
             {

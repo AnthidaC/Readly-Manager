@@ -58,6 +58,14 @@ public class PageManager : MonoBehaviour
     public TMP_InputField PublisherIn;
     public TMP_InputField bookImageIn;
 
+    [Header("Book Edit alert")]
+    public GameObject EditSS;
+    public GameObject nameNULL2;
+    public GameObject priceNULL2;
+    public GameObject stockNULL2;
+    public GameObject imgLoading2;
+    public Image bookImageOut2;
+
     [Header("Book Add")]
     public TMP_InputField bookNameIn2;
     public TMP_InputField contentIn2;
@@ -70,8 +78,12 @@ public class PageManager : MonoBehaviour
     public TMP_InputField bookImageIn2;
     public Image bookImageOut;
 
+    [Header("Book Add alert")]
     public GameObject AddSS;
-    public GameObject EditSS;
+    public GameObject nameNULL;
+    public GameObject priceNULL;
+    public GameObject stockNULL;
+    public GameObject imgLoading;
 
     private ImageManager imgMana;
     private DataManager dataMana;
@@ -194,18 +206,68 @@ public class PageManager : MonoBehaviour
         
     }
 
-    public void AddBook()
+    public void loadimgAdd()
     {
-        //print(bookNameIn2.text+  int.Parse(priceIn.text)+ contentIn2.text+ PublisherIn2.text+ AuthorIn2.text+ int.Parse(stockIn2.text)+ ((typeBook)(typeIn2.value)).ToString()+((statusBook)statusIn2.value).ToString());
-         Book book = new Book(bookNameIn2.text,  int.Parse(priceIn2.text), contentIn2.text, PublisherIn2.text, AuthorIn2.text, int.Parse(stockIn2.text), ((typeBook)(typeIn2.value)).ToString(),((statusBook)statusIn2.value).ToString());
-        if(!String.IsNullOrEmpty(bookImageIn2.text))
+        if (!String.IsNullOrEmpty(bookImageIn2.text))
             StartCoroutine(imgMana.DownloadImage(bookImageIn2.text, Img =>
             {
                 if (Img != null)
                 {
-                    book.setImg(imgMana.TexttureTo64(Img));
                     print("have img");
                     bookImageOut.sprite = imgMana.TexttureToImg(Img);
+                    imgLoading.SetActive(false);
+                }
+                else imgLoading.SetActive(true);
+
+            }));
+        else imgLoading.SetActive(true);
+    }
+
+    public void loadimgEdit()
+    {
+        if (!String.IsNullOrEmpty(bookImageIn2.text))
+            StartCoroutine(imgMana.DownloadImage(bookImageIn2.text, Img =>
+            {
+                if (Img != null)
+                {
+                    print("have img");
+                    bookImageOut2.sprite = imgMana.TexttureToImg(Img);
+                    imgLoading2.SetActive(false);
+                }
+                else imgLoading2.SetActive(true);
+
+            }));
+        else imgLoading2.SetActive(true);
+    }
+
+    public void AddBook()
+    {
+        if (String.IsNullOrEmpty(bookNameIn2.text))
+        {
+            nameNULL.SetActive(true);
+        }
+        else if (String.IsNullOrEmpty(priceIn2.text)||!int.TryParse(priceIn2.text, out _)) {
+            nameNULL.SetActive(false);
+            priceNULL.SetActive(true); }
+        else if (String.IsNullOrEmpty(stockIn2.text)||!int.TryParse(stockIn2.text, out _)) {
+            nameNULL.SetActive(false);
+            priceNULL.SetActive(false);
+            stockNULL.SetActive(true); }
+        else
+        {
+            nameNULL.SetActive(false);
+            priceNULL.SetActive(false);
+            stockNULL.SetActive(false);
+            Book book = new Book(bookNameIn2.text, int.Parse(priceIn2.text), contentIn2.text, PublisherIn2.text, AuthorIn2.text, int.Parse(stockIn2.text), ((typeBook)(typeIn2.value)).ToString(), ((statusBook)statusIn2.value).ToString());
+            if (!String.IsNullOrEmpty(bookImageIn2.text))
+                StartCoroutine(imgMana.DownloadImage(bookImageIn2.text, Img =>
+                {
+                    if (Img != null)
+                    {
+                        book.setImg(imgMana.TexttureTo64(Img));
+                        print("have img");
+                        bookImageOut.sprite = imgMana.TexttureToImg(Img);
+                    }
                     StartCoroutine(dataMana.AddBook(book, v =>
                     {
                         if (v == 1)
@@ -216,50 +278,84 @@ public class PageManager : MonoBehaviour
                             {
                                 if (b == 1)
                                 {
+                                    print("hi");
                                     AddSS.SetActive(true);
                                 }
                             }));
                         }
                     }));
-                }
 
-            }));
-        else 
-            StartCoroutine(dataMana.AddBook(book, v =>
-            {
-                if (v == 1)
+                }));
+            else
+                StartCoroutine(dataMana.AddBook(book, v =>
                 {
-                    DataManager.book.Clear();
-                    DataManager.orders.Clear();
-                    StartCoroutine(dataMana.GetNormalData(b =>
+                    if (v == 1)
                     {
-                        if (b == 1)
+                        DataManager.book.Clear();
+                        DataManager.orders.Clear();
+                        StartCoroutine(dataMana.GetNormalData(b =>
                         {
-                            AddSS.SetActive(true);
-                        }
-                    }));
-                }
-            }));
+                            if (b == 1)
+                            {
+                                AddSS.SetActive(true);
+                            }
+                        }));
+                    }
+                }));
+        }
     }
     public void EditBook()
     {
-        //print(bookNameIn2.text+  int.Parse(priceIn.text)+ contentIn2.text+ PublisherIn2.text+ AuthorIn2.text+ int.Parse(stockIn2.text)+ ((typeBook)(typeIn2.value)).ToString()+((statusBook)statusIn2.value).ToString());
-        Book book = bookObject.GetComponent<BookDetail>().book;
-        book.Name = bookNameIn.text;
-        book.Price = int.Parse(priceIn.text);
-        book.Title = contentIn.text;
-        book.Publisher = PublisherIn.text;
-        book.Author = AuthorIn.text;
-        book.Stock = int.Parse(stockIn.text);
-        book.TypeBook = ((typeBook)(typeIn.value)).ToString();
-        book.Status=((statusBook)statusIn.value).ToString();
-        if (!String.IsNullOrEmpty(bookImageIn.text))
-            StartCoroutine(imgMana.DownloadImage(bookImageIn.text, Img =>
-            {
-                if (Img != null)
-                {
-                    book.setImg(imgMana.TexttureTo64(Img));
-                    print("have img");
+        if (String.IsNullOrEmpty(bookNameIn.text))
+        {
+            nameNULL2.SetActive(true);
+        }
+        else if (String.IsNullOrEmpty(priceIn.text)||!int.TryParse(priceIn.text, out _))
+        {
+            nameNULL2.SetActive(false);
+            priceNULL.SetActive(true);
+        }
+        else if (String.IsNullOrEmpty(stockIn.text)|| !int.TryParse(stockIn.text,out _))
+        {
+            nameNULL2.SetActive(false);
+            priceNULL2.SetActive(false);
+            stockNULL2.SetActive(true);
+        }
+        else
+        {
+            nameNULL2.SetActive(false);
+            priceNULL2.SetActive(false);
+            stockNULL2.SetActive(false);
+            
+                //print(bookNameIn2.text+  int.Parse(priceIn.text)+ contentIn2.text+ PublisherIn2.text+ AuthorIn2.text+ int.Parse(stockIn2.text)+ ((typeBook)(typeIn2.value)).ToString()+((statusBook)statusIn2.value).ToString());
+                Book book = bookObject.GetComponent<BookDetail>().book;
+                book.Name = bookNameIn.text;
+                book.Price = int.Parse(priceIn.text);
+                book.Title = contentIn.text;
+                book.Publisher = PublisherIn.text;
+                book.Author = AuthorIn.text;
+                book.Stock = int.Parse(stockIn.text);
+                book.TypeBook = ((typeBook)(typeIn.value)).ToString();
+                book.Status = ((statusBook)statusIn.value).ToString();
+                if (!String.IsNullOrEmpty(bookImageIn.text))
+                    StartCoroutine(imgMana.DownloadImage(bookImageIn.text, Img =>
+                    {
+                        if (Img != null)
+                        {
+                            book.setImg(imgMana.TexttureTo64(Img));
+                            print("have img");
+                            StartCoroutine(dataMana.EditBook(book, v =>
+                            {
+                                if (v == 1)
+                                {
+                                    bookObject.GetComponent<BookDetail>().Show();
+                                    EditSS.SetActive(true);
+                                }
+                            }));
+                        }
+
+                    }));
+                else
                     StartCoroutine(dataMana.EditBook(book, v =>
                     {
                         if (v == 1)
@@ -268,18 +364,7 @@ public class PageManager : MonoBehaviour
                             EditSS.SetActive(true);
                         }
                     }));
-                }
-
-            }));
-        else
-            StartCoroutine(dataMana.EditBook(book, v =>
-            {
-                if (v == 1)
-                {
-                    bookObject.GetComponent<BookDetail>().Show();
-                    EditSS.SetActive(true);
-                }
-            }));
+            }
     }
 
     public void close()

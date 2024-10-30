@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 public class User
 {
     private int userID;
-    private int castID;
+    private int cartID;
     private string email;
     private string userName;
     public int UserID
@@ -23,10 +23,10 @@ public class User
         set { userName = value; }
     }
 
-    public int CastID
+    public int CartID
     {
-        get { return castID; }
-        set { castID = value; }
+        get { return cartID; }
+        set { cartID = value; }
     }
 
     public string Email { get => email; set => email = value; }

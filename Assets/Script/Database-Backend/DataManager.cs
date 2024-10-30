@@ -75,8 +75,8 @@ public class DataManager : MonoBehaviour
                         user.UserID = int.Parse(data[0]);
                         user.UserName = data[1];
                         user.Email = data[2];
-                        user.CastID = int.Parse(data[3]);
-                        userCart = new Cart(user.CastID);
+                        user.CartID = int.Parse(data[3]);
+                        userCart = new Cart(user.CartID);
                         Debug.Log("Login success Userid :"+user.UserID);
                         StartCoroutine(GetOrderData());
                         StartCoroutine(GetCartData());
@@ -112,27 +112,33 @@ public class DataManager : MonoBehaviour
                     {
                         StartCoroutine( GetBook(tex));
                     }
+                    callback?.Invoke(1);
                     print(tex);
                 }
                 
-
+                callback?.Invoke(1);
             }
         }
     }
 
     IEnumerator GetBook(string tex)
     {
-        tex=tex.Remove(0,1);
+        print(tex);
+        print((tex.Length));
+        tex =tex.Remove(0,1);
         print(tex);
         print((tex.Length));
         tex=tex.Remove((tex.Length)-1,1);
         string[] books = tex.Split(',');
         for (int i = 0; i < books.Length; i++)
         {
+            print("this is 0"+ books[i].ToCharArray()[0]);
             books[i]=books[i].Remove(0,1);
             string v = books[i].Remove(books[i].Length - 1, 1);
             books[i] = v;
            string[] detail = books[i].Split("-");
+            foreach (string ii in detail)print(ii);
+            print(detail.Length+"lennn");
             WWWForm form = new WWWForm();
             book.Add(int.Parse(detail[0]), new Book(detail[1], int.Parse(detail[0]), int.Parse(detail[5]), detail[8], detail[4], detail[2], int.Parse(detail[6]), detail[3], detail[7]));
             form.AddField("bookID",detail[0]) ;
@@ -174,7 +180,7 @@ public class DataManager : MonoBehaviour
                 pageOrder.loadingOrder();
             }
         }));
-        print("this is status book 1 :" + book[1].Status);
+        print("this is status book 1 :" + book[2].Status);
     }
     public IEnumerator GetOrderDetail(int id)
     {
@@ -211,6 +217,8 @@ public class DataManager : MonoBehaviour
                             print(tex);
                             print((tex.Length));
                             tex = tex.Remove((tex.Length) - 1, 1);
+                            print(tex);
+                            print((tex.Length));
                             string[] detail = tex.Split(',');
                             for (int i = 0; i < detail.Length; i++)
                             {
@@ -283,7 +291,7 @@ public class DataManager : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("id", user.UserID);
         form.AddField("detail", address);
-        form.AddField("cartID", user.CastID);
+        form.AddField("cartID", user.CartID);
 
         using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/Readly_Pj/SetOrderData.php", form))
         {
@@ -345,7 +353,7 @@ public class DataManager : MonoBehaviour
     public IEnumerator AddCartData(int bookID ,int num, System.Action<int> callback = null)
     {
         WWWForm form = new WWWForm();
-        form.AddField("cartID", user.CastID);
+        form.AddField("cartID", user.CartID);
         form.AddField("amount", num);
         form.AddField("bookID", bookID);
 
@@ -383,7 +391,7 @@ public class DataManager : MonoBehaviour
     public IEnumerator ChangeNumBookInCart(int bookID, int num, System.Action<int> callback = null)
     {
         WWWForm form = new WWWForm();
-        form.AddField("cartID", user.CastID);
+        form.AddField("cartID", user.CartID);
         form.AddField("amount", num);
         form.AddField("bookID", bookID);
 
@@ -421,7 +429,7 @@ public class DataManager : MonoBehaviour
     public IEnumerator DeleteBookInCart(int bookID, System.Action<int> callback = null)
     {
         WWWForm form = new WWWForm();
-        form.AddField("cartID", user.CastID);
+        form.AddField("cartID", user.CartID);
         form.AddField("bookID", bookID);
 
         using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/Readly_Pj/DeleteBookInCart.php", form))
@@ -458,7 +466,7 @@ public class DataManager : MonoBehaviour
     public IEnumerator DeleteAllBookInCart(System.Action<int> callback = null)
     {
         WWWForm form = new WWWForm();
-        form.AddField("cartID", user.CastID);
+        form.AddField("cartID", user.CartID);
 
         using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/Readly_Pj/DeleteAllBookInCart.php", form))
         {
@@ -494,7 +502,7 @@ public class DataManager : MonoBehaviour
     public IEnumerator GetCartData()
     {
         WWWForm form = new WWWForm();
-        form.AddField("id", user.CastID);
+        form.AddField("id", user.CartID);
 
         using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/Readly_Pj/GetCartData.php", form))
         {
